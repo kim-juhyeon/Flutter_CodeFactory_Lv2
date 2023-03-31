@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:lv2_codefactory/common/const/colors.dart';
 
 class CustomTextFormField extends StatelessWidget {
-  final String?
-      hintText; //textfild 별로 따로 받아야 하기 때문에 파라미터화 해줍니다. 혹시나 아무것도 안 넣을 수 있기때문에 String? , requrired도 취소합니다.
+  final String? hintText;
+  //textfild 별로 따로 받아야 하기 때문에 파라미터화 해줍니다. 혹시나 아무것도 안 넣을 수 있기때문에 String? , requrired도 취소합니다.
+  // errorText , obscureText, outofocus 의 경우 외부에서 추가적으로 받아오는 경우에는 파라미터로(final)로 정의한다.
   final errorText;
   final bool obscureText;
   final bool outofocus;
@@ -51,6 +52,9 @@ class CustomTextFormField extends StatelessWidget {
         filled: true,
         //border는 모든 input상태의 스타일 세팅
         border: baseBorder,
+        //InputDecorator 가 활성화되고 오류를 표시하지 않을 때 표시할 테두리입니다 .
+        enabledBorder: baseBorder,
+
         /*focuseBorder의 경우에는 decoration을 눌렀을때 해당하는 위젯이다. copyWith을 이용하여 borderside를 가져와서 필요한 부분만 수정할 수 있다.
           수정 : baseBorder 를 가져오고 하위 부분인 borderSide 색상만 바꿔야 하기 때문에 baseBorder.borderSide를 한번 더 넣어줬다.*/
         focusedBorder: baseBorder.copyWith(
