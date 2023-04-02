@@ -7,11 +7,13 @@ class DefaultLayout extends StatelessWidget {
   final Color? backgroudColor;
   final Widget child;
   final String? title;
+  final Widget? bottomNavigationBar;
 
   const DefaultLayout({
     this.backgroudColor,
     required this.child,
     this.title,
+    this.bottomNavigationBar,
     Key? key,
   }) : super(key: key);
 
@@ -21,6 +23,7 @@ class DefaultLayout extends StatelessWidget {
       backgroundColor: backgroudColor ?? Colors.white,
       appBar: renderAppBar(),
       body: child,
+      bottomNavigationBar: bottomNavigationBar,
     );
   }
 
@@ -36,7 +39,9 @@ class DefaultLayout extends StatelessWidget {
         title: Text(
           //text에는 null이 들어가면 안되니까 밑줄이 생기는데, ! = 널이 될 수 없다고 확인을 해줌
           title!,
+          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500),
         ),
+        foregroundColor: Colors.black,
       );
     }
   }
