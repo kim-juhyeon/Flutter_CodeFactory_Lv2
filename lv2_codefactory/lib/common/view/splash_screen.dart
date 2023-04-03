@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lv2_codefactory/common/const/data.dart';
 import 'package:lv2_codefactory/common/layout/default_layout.dart';
@@ -32,7 +33,30 @@ class _SplashScreenState extends State<SplashScreen> {
     final refreshToken = await storage.read(key: REFRESH_TOKEN_KEY);
     final accessToken = await storage.read(key: ACCESS_TOKEN_KEY);
     // 페이지 이동할 때 쌓인 페이지 다 지우고 이동하고 싶을 때! (pushAndRemoveUntill)
-    if (refreshToken == null || accessToken == null) {
+    /*정리
+    리프레시토큰을 넣으면 storage에 있는 토큰을 가져와서 리프레시 토큰을 기반으로 access토큰을 발급을 받음*/
+    final dio = Dio();
+
+    try {
+      final resp = await dio.post(
+        //dio 패키지 options을 이용해서 token정보를 입력한다.
+        'http://$ip/auth/token',
+        options: Options(
+          headers: {
+            'authorization': 'Bearer $refreshToken',
+          },
+        ),
+      );
+      //재실행 할때마다 accesstoken이 갱신됩니다.
+      await storage.write(
+          key: ACCESS_TOKEN_KEY, value: resp.data['accessToken']);
+
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => RootTab(),
+          ),
+          (route) => false);
+    } catch (e) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           //만약에 토큰이 두개다 없을 때 로그인페이지로 넘어가고,
@@ -40,12 +64,6 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
         (route) => false,
       );
-    } else {
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (_) => RootTab(),
-          ),
-          (route) => false);
     }
   }
 
