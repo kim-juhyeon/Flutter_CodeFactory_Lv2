@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lv2_codefactory/common/const/data.dart';
+import 'package:lv2_codefactory/restaurant/model/restaurant_model.dart';
+import 'package:lv2_codefactory/restaurant/view/restaurant_detail_screen.dart';
 
 import '../component/restaurant_card.dart';
 
@@ -46,21 +48,21 @@ class RestaurnatScreen extends StatelessWidget {
                     //itemBuilder가 실행될 때마다 0~20번의 item이 선택이 된다.
                     //item = index 설정으로 해당하는 url을 가져와서 빌드한다.
                     final item = snapshot.data![index];
-                    return RestaurantCard(
-                      image: Image.network(
-                        'http://$ip${item['thumbUrl']}',
-                        fit: BoxFit.cover,
+                    //factory화 하는데 item에 변수에서 에러가 나오기 때문에 retaurnatmodel.fromejson 그리고 json:item은 같다는 로직을 짜줍니다.
+                    final pItem = RestaurantModel.fromeJson(json: item);
+                    //RestaurantCard도 factory화 해서 fromModel로 변수를 지정해 줬고 이를 pItem과 같다라는 걸 명령해야 에러가 없음
+                    //GestureDetector 눌렀을때 반응할 수 있는 위젯이고 안에 onTap을 하여 detailpage로 넘어갈 수 있게 만듬
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => RestaurantDetailScreen(),
+                          ),
+                        );
+                      },
+                      child: RestaurantCard.fromModel(
+                        model: pItem,
                       ),
-                      //Image.asset(
-                      //'asset/img/food/ddeok_bok_gi.jpg',
-                      //fit: BoxFit.cover,
-                      //),
-                      name: item['name'],
-                      tags: List<String>.from(item['tags']),
-                      ratingsCount: item['ratingsCount'],
-                      deliveryTime: item['deliveryTime'],
-                      deliveryFee: item['deliveryFee'],
-                      ratings: item['ratings'],
                     );
                   },
                   separatorBuilder: (_, index) {
