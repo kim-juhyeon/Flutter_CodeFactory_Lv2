@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:lv2_codefactory/common/const/data.dart';
+import 'package:lv2_codefactory/common/dio/dio.dart';
 import 'package:lv2_codefactory/common/layout/default_layout.dart';
 import 'package:lv2_codefactory/product/component/product_card.dart';
 import 'package:lv2_codefactory/restaurant/model/restaurant_detail_model.dart';
+import 'package:lv2_codefactory/restaurant/repository/restaurant_repository.dart';
 
 import '../component/restaurant_card.dart';
 
@@ -12,19 +14,19 @@ class RestaurantDetailScreen extends StatelessWidget {
 
   const RestaurantDetailScreen({required this.id, Key? key}) : super(key: key);
 
-  Future<Map<String, dynamic>> getRestaurantDetail() async {
+  Future<RestaurantDetailModel> getRestaurantDetail() async {
     final dio = Dio();
-    final accessToken = await storage.read(key: ACCESS_TOKEN_KEY);
 
-    final resp = await dio.get(
-      'http://$ip/restaurant/$id',
-      options: Options(
-        headers: {
-          'authorizations': 'Bearer $accessToken',
-        },
+    dio.interceptors.add(
+      CustomInterceptor(
+        storage: storage,
       ),
     );
-    return resp.data;
+
+    final repository =
+        RestaurantRepository(dio, baseUrl: 'http://$ip/restaurant');
+
+    return repository.getRestaurantDetail(id: id);
   }
 
   @override
@@ -32,25 +34,28 @@ class RestaurantDetailScreen extends StatelessWidget {
     return DefaultLayout(
       title: '블타는 떡볶이',
       //알반 위젯(레스토랑카드)을 스크롤 뷰를 만들 수 있음
-      child: FutureBuilder<Map<String, dynamic>>(
+      child: FutureBuilder<RestaurantDetailModel>(
         future: getRestaurantDetail(),
-        builder: (_, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+        builder: (_, AsyncSnapshot<RestaurantDetailModel> snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(snapshot.error.toString()),
+            );
+          }
           if (!snapshot.hasData) {
             return Center(
               child: CircularProgressIndicator(),
             );
           }
-          final item = RestaurantDetailModel.fromJson(
-            snapshot.data!,
-          );
+
           return CustomScrollView(
             slivers: [
               renderTop(
-                model: item,
+                model: snapshot.data!,
               ),
               renderLabel(),
               renderProducts(
-                products: item.products,
+                products: snapshot.data!.products,
               ),
             ],
           );
