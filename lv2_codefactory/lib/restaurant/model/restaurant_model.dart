@@ -1,6 +1,10 @@
 //서버에 있는 코드를 따로 불러오는 이유 : 서버에서 가져오는 파일 곧 변수들은
 //불러온는 코드에서 잘 못 입력을 해도 오류가 발생하지 않기 때문에 따로 서버에서 불러온 변수값들을 저장한다. 휴먼실수를 줄이기 위해서 진행함
-import '../../common/const/data.dart';
+import 'package:json_annotation/json_annotation.dart';
+import 'package:lv2_codefactory/common/utils/data_utils.dart';
+
+//flutter pub run build_runner build
+part 'restaurant_model.g.dart';
 
 enum RestaurantPriceRange {
   expensive,
@@ -8,9 +12,14 @@ enum RestaurantPriceRange {
   cheap,
 }
 
+//@jsonserializable을 지정해줘서 해당 클래스 코드가 따로 저장된다.
+@JsonSerializable()
 class RestaurantModel {
   final String id;
   final String name;
+  @JsonKey(
+    fromJson: DataUtils.pathToUrl,
+  )
   final String thumbUrl;
   final List<String> tags;
   final RestaurantPriceRange priceRange;
@@ -30,24 +39,30 @@ class RestaurantModel {
     required this.deliveryTime,
     required this.deliveryFee,
   });
+
+  factory RestaurantModel.fromJson(Map<String, dynamic> json) =>
+      _$RestaurantModelFromJson(json);
+//json으로 intance를 변환하는 것
+  Map<String, dynamic> toJson() => _$RestaurantModelToJson(this);
+
 //RestuarnatMpdel 을 factory화 하는 이유: 변수 값을 작업하기 편하기 위해 진행을한다.
 // RestuarnatMpdel 을 fromejson으로 변환 그리고 json은 map형태로 요청, json map코드는 string,dynamic은 국룰
-  factory RestaurantModel.fromeJson({
-    required Map<String, dynamic> json,
-  }) {
-    return RestaurantModel(
-      id: json['id'],
-      name: json['name'],
-      thumbUrl: 'http://$ip${json['thumbUrl']}',
-      tags: List<String>.from(json['tags']),
-      //priceRange에는 expensive,medium,cheap 값이 enum에 들어가 있는데 item에 priceRange에 똑같은 값을 찾는다.
-      priceRange: RestaurantPriceRange.values.firstWhere(
-        (e) => e.name == json['priceRange'],
-      ),
-      ratings: json['ratings'],
-      ratingsCount: json['ratingsCount'],
-      deliveryTime: json['deliveryTime'],
-      deliveryFee: json['deliveryFee'],
-    );
-  }
+  // factory RestaurantModel.fromeJson({
+  //   required Map<String, dynamic> json,
+  // }) {
+  //   return RestaurantModel(
+  //     id: json['id'],
+  //     name: json['name'],
+  //     thumbUrl: 'http://$ip${json['thumbUrl']}',
+  //     tags: List<String>.from(json['tags']),
+  //     //priceRange에는 expensive,medium,cheap 값이 enum에 들어가 있는데 item에 priceRange에 똑같은 값을 찾는다.
+  //     priceRange: RestaurantPriceRange.values.firstWhere(
+  //       (e) => e.name == json['priceRange'],
+  //     ),
+  //     ratings: json['ratings'],
+  //     ratingsCount: json['ratingsCount'],
+  //     deliveryTime: json['deliveryTime'],
+  //     deliveryFee: json['deliveryFee'],
+  //   );
+  // }
 }

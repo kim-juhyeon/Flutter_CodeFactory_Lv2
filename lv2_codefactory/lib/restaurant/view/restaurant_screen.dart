@@ -38,10 +38,12 @@ class RestaurnatScreen extends StatelessWidget {
             future: paginateRestaurant(),
             builder: (context, AsyncSnapshot<List> snapshot) {
               if (!snapshot.hasData) {
-                return Container();
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
               }
               /*future builder로 snapshot이 계속 업데이트 될 수 있도록 한다. 
-              hasData가 false이면 빈 Container가 반환됩니다..*/
+              hasData가 false이면 빈 Container->circulater가 반환됩니다..*/
               return ListView.separated(
                   itemCount: snapshot.data!.length,
                   itemBuilder: (_, index) {
@@ -49,14 +51,18 @@ class RestaurnatScreen extends StatelessWidget {
                     //item = index 설정으로 해당하는 url을 가져와서 빌드한다.
                     final item = snapshot.data![index];
                     //factory화 하는데 item에 변수에서 에러가 나오기 때문에 retaurnatmodel.fromejson 그리고 json:item은 같다는 로직을 짜줍니다.
-                    final pItem = RestaurantModel.fromeJson(json: item);
+                    final pItem = RestaurantModel.fromJson(item);
                     //RestaurantCard도 factory화 해서 fromModel로 변수를 지정해 줬고 이를 pItem과 같다라는 걸 명령해야 에러가 없음
                     //GestureDetector 눌렀을때 반응할 수 있는 위젯이고 안에 onTap을 하여 detailpage로 넘어갈 수 있게 만듬
                     return GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (_) => RestaurantDetailScreen(),
+                            builder: (_) => RestaurantDetailScreen(
+                              //Screen에 있는 id 값이 detailScreen에 넘어갈려면 id값이 있어야 하기 때문에 id값을 pItem.id값과 id가 같다고 해줍니다.
+                              //그리고 DetailScreen에 id를 명시해줍니다.
+                              id: pItem.id,
+                            ),
                           ),
                         );
                       },
