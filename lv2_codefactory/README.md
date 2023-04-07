@@ -2,12 +2,12 @@
 
 CodeFactory 
 
-Authentication - 인증 시스템활용
-Pagination - 유지보수
-JsonSeriailzable Retorfi Code  - rest api 정리
-Riverpod = 글로벌 상태관리 캐시관리
-GoRouter Navigation - 선언형 내비게이션
-Swagger - 자료  
+- Authentication - 인증 시스템활용
+- Pagination - 유지보수
+- JsonSeriailzable Retorfi Code  - rest api 정리
+- Riverpod = 글로벌 상태관리 캐시관리
+- GoRouter Navigation - 선언형 내비게이션
+- Swagger - 자료  
 ## Getting Started
 
 This project is a starting point for a Flutter application.
