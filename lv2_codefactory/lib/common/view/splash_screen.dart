@@ -1,20 +1,22 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lv2_codefactory/common/const/data.dart';
 import 'package:lv2_codefactory/common/layout/default_layout.dart';
+import 'package:lv2_codefactory/common/secure_storage/secure_storage.dart';
 import 'package:lv2_codefactory/common/view/root_table.dart';
 import 'package:lv2_codefactory/user/view/login_screen.dart';
 
 import '../const/colors.dart';
 
 // splashScreen 처음 생성될때 토큰을 가지고 있는지 확인
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -24,11 +26,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void deleteToken() async {
+    final storage = ref.read(secureStorageProvider);
     await storage.deleteAll();
   }
 
   void checkToken() async {
     // storage.raad <- 미리 저장해둔 키 값을 불러올 수 있음.
+    final storage = ref.read(secureStorageProvider);
 
     final refreshToken = await storage.read(key: REFRESH_TOKEN_KEY);
     final accessToken = await storage.read(key: ACCESS_TOKEN_KEY);

@@ -1,5 +1,5 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lv2_codefactory/common/const/data.dart';
 import 'package:lv2_codefactory/common/dio/dio.dart';
 import 'package:lv2_codefactory/restaurant/model/restaurant_model.dart';
@@ -8,15 +8,12 @@ import 'package:lv2_codefactory/restaurant/view/restaurant_detail_screen.dart';
 
 import '../component/restaurant_card.dart';
 
-class RestaurnatScreen extends StatelessWidget {
+class RestaurnatScreen extends ConsumerWidget {
   const RestaurnatScreen({Key? key}) : super(key: key);
-
-  Future<List<RestaurantModel>> paginateRestaurant() async {
-    final dio = Dio();
-// dio 패키지를 이용하여 api에 접속을 하고 accesstoken을 가져온다.
-    dio.interceptors.add(
-      CustomInterceptor(storage: storage),
-    );
+//provider를 이용하여 dio를 글로벌 함수로 정하게 되었고, dio를 resp에 넣어 줬는데 문제없이 돌아가게 되었음 : dio에 storage파일을 포함하고 있으므로
+//똑깥은 인스턴스를 불러올 수 있는 장점이 있음!
+  Future<List<RestaurantModel>> paginateRestaurant(WidgetRef ref) async {
+    final dio = ref.watch(dioProvider);
 
 //splash_screen과 동일하게 storage 토큰 값을 가져온다.
 // 그리고 postman으로 수정했던 부분 곧 accessToken 레스토랑 데이터를 가져올 수 있게되었다.
@@ -27,14 +24,14 @@ class RestaurnatScreen extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       child: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: FutureBuilder<List<RestaurantModel>>(
             //paginateRestaurant() 메서드를 호출하여 Dio 패키지를 사용하여 API에서 레스토랑 목록을 가져옵니다.
-            future: paginateRestaurant(),
+            future: paginateRestaurant(ref),
             builder: (context, AsyncSnapshot<List<RestaurantModel>> snapshot) {
               if (!snapshot.hasData) {
                 return Center(

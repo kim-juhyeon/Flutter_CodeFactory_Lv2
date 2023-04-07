@@ -1,7 +1,23 @@
 /*1.요청을 보낼때, 2.응답을 보낼때, 3.에러가 났을때 */
+import 'dart:html';
+
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lv2_codefactory/common/const/data.dart';
+import 'package:lv2_codefactory/common/secure_storage/secure_storage.dart';
+
+//ref는 또라른 provider를 불러오는 함수,
+final dioProvider = Provider<Dio>((ref) {
+  final dio = Dio();
+
+  final storage = ref.watch(secureStorageProvider);
+
+  dio.interceptors.add(
+    CustomInterceptor(storage: storage),
+  );
+  return dio;
+});
 
 class CustomInterceptor extends Interceptor {
   final FlutterSecureStorage storage;

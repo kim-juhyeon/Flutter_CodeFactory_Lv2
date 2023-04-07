@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lv2_codefactory/common/view/splash_screen.dart';
 
+//providerScope 관리 가장높은 위치 설정이 필요
 void main() {
   runApp(
-    const _App(),
+    ProviderScope(
+      child: const _App(),
+    ),
   );
 }
 

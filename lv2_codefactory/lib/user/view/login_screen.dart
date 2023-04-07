@@ -1,22 +1,25 @@
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lv2_codefactory/common/const/colors.dart';
 import 'package:lv2_codefactory/common/const/data.dart';
 import 'package:lv2_codefactory/common/layout/default_layout.dart';
+import 'package:lv2_codefactory/common/secure_storage/secure_storage.dart';
 import 'package:lv2_codefactory/common/view/root_table.dart';
 
 import '../../common/component/custom_text_form_field.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   String username = '';
   String password = '';
 
@@ -94,6 +97,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     //resp.data = 토큰바디값을 refreshToken에 담고 이것을 securestorage에 담는다.
                     final refreshToken = resp.data['refreshToken'];
                     final accessToken = resp.data['accessToken'];
+                    
+                    // 글로벌 함수 
+                    final storage = ref.read(secureStorageProvider);
 
                     await storage.write(
                         key: REFRESH_TOKEN_KEY, value: refreshToken);
