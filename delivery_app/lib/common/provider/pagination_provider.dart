@@ -1,40 +1,15 @@
 import 'package:delivery_app/common/model/cursor_pagination_model.dart';
 import 'package:delivery_app/common/model/pagination_params.dart';
-import 'package:delivery_app/restaurant/model/restaurant_detail_model.dart';
-import 'package:delivery_app/restaurant/model/restaurant_model.dart';
-import 'package:delivery_app/restaurant/repository/restaurant_repository.dart';
+import 'package:delivery_app/common/repository/base_pagination_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final restaurantDetailProvider =
-    Provider.family<RestaurantModel?, String>((ref, id) {
-  final state = ref.watch(
-      restaurantProvider); //restaurantDetailProvider는 id 데이터를 가져오는 역할을 합니다.
-  // id가 끝에 들어와야 after을 불러올 수 있기때문
+class PaginationProvider<U extends IBasePaginationRepository> extends StateNotifier<CursorPaginationBase>{
+  final U repository; //RatingRepository, RestaurantRepository 를 정할필요 없이 Ibase에 제너릭으로 받았기 때문에 OOP 형식의 위배되지 않음!
 
-  if (state is! CursorPagination) {
-    return null;
-  }
-  return state.data.firstWhere((element) => element.id == id);
-});
 
-final restaurantProvider =
-    StateNotifierProvider<RestaurantStateNotifier, CursorPaginationBase>(
-  (ref) {
-    final repository = ref.watch(restaurantRepositoryProvider);
-    final notifier = RestaurantStateNotifier(repository: repository);
-
-    return notifier;
-  },
-);
-
-class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
-  final RestaurantRepository repository;
-
-  RestaurantStateNotifier({
+  PaginationProvider({
     required this.repository,
-  }) : super(CursorPaginationLoding()) {
-    paginate();
-  }
+}): super(CursorPaginationLoding());
 
   Future<void> paginate({
     int fetchCount = 20,
@@ -61,7 +36,7 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
       //    fetchMore가 아닐때 - 새로고침의 의도가 있을 수 있다.
       if (state is CursorPagination && !forceRefetch) {
         final pState = state
-            as CursorPagination; //as 값을 state가 CursorPagination 상태라고 공표해준다. 위쪽 코드에서 정의해줬지만, 런타임에서 다시 한번 공표를 해줌
+        as CursorPagination; //as 값을 state가 CursorPagination 상태라고 공표해준다. 위쪽 코드에서 정의해줬지만, 런타임에서 다시 한번 공표를 해줌
         if (!pState.meta.hasMore) {
           //hasMore는 다음 페이지에 데이터가 있는지 없는지에 대한 것입니다. CursorPagination은 이미 api통신으로 데이터를 가지고 있습니다. hasmore가 false 일경우에는 바로 기존 데이터를(paginate함수를 실행하지 않는다.) 반환합니다.
           return;
@@ -91,7 +66,7 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
         paginationParams = paginationParams.copywith(
             after: pState
                 .data.last.id //api 주소: after데이터 뒤에 id 값을 기입함으로써, 다음페이지를 가져오기 위함
-            );
+        );
         //데이터를 처음부터 가져오는 상황
       } else {
         //만약에 데이터가 있는 상황이라면
@@ -109,7 +84,7 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
       }
 
       final resp =
-          await repository.paginate(paginationParams: paginationParams);
+      await repository.paginate(paginationParams: paginationParams);
       if (state is CursorPaginationFetchingMore) {
         //paginate로 새로운 데이터를 넘겨줍니다.
         final pState = state as CursorPaginationFetchingMore;
@@ -128,30 +103,4 @@ class RestaurantStateNotifier extends StateNotifier<CursorPaginationBase> {
     }
   }
 
-  getDetail({
-    required String id,
-  }) async {
-    // 만약에 아직 데이터가 하나도 없는 상태라면 (CussorPagination이 아니라면) 데이터를 가져오는 시도를 합니다.
-    if (state is! CursorPagination) {
-      await this.paginate();
-    }
-    // state가 Cursorpagination이 아닐때 그냥 return
-    if (state is! CursorPagination) {
-      return;
-    }
-    final pState = state as CursorPagination; //기존 state
-
-    final resp = await repository.getRestaurantDetail(id: id); //id값을 교체한 state
-    //[RestaturantModel(1), RestaurantModel(2), RestaurantModel(3)]
-    // id : 2인 친구를 detail모델을 가져오자
-    // getDetail(id: 2);
-    // [RestaturantModel(1), RestaurantDetailModel(2), RestaurantModel(3)]
-    state = pState.copyWith(
-      data: pState.data
-          .map<RestaurantModel>(
-            (e) => e.id == id ? resp : e,
-          )
-          .toList(), //id를 교체하는 로직
-    );
-  }
 }

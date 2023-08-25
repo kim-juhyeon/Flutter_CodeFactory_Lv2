@@ -1,3 +1,5 @@
+
+
 import 'package:delivery_app/common/const/colors.dart';
 import 'package:delivery_app/restaurant/model/restaurant_detail_model.dart';
 import 'package:delivery_app/restaurant/model/restaurant_model.dart';
@@ -13,6 +15,8 @@ class RestaurantCard extends StatelessWidget {
   final double ratings;
   final bool isDetail; //상세 페이지 여부, 해당 bool값은 스크린에서 상세페이지 넘어갈때 불러올때 필요한 데이터만 불러올 수 있게 변경
   final String? detail;
+  // Hero 위젯 태그
+  final String? heroKey;
 
   const RestaurantCard({required this.image,
     required this.name,
@@ -22,6 +26,7 @@ class RestaurantCard extends StatelessWidget {
     required this.deliveryFee,
     required this.ratings,
     this.isDetail = false,
+    this.heroKey,
     this.detail, //detailpage에서는 true로 변경
     Key? key})
       : super(key: key);
@@ -35,6 +40,7 @@ class RestaurantCard extends StatelessWidget {
         model.thumbUrl,
         fit: BoxFit.cover,
       ),
+      heroKey: model.id,
       name: model.name,
       tags: model.tags,
       ratingsCount: model.ratingsCount,
@@ -50,10 +56,17 @@ class RestaurantCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        if (isDetail) image,
-        if (!isDetail)
+        if(heroKey != null) //heroKey를 이용해서 ui적으로 부드럽게 할 수 있음 model의 id값이 동일하다면 이미지가 추적이됩니다.
+          Hero(
+            tag: ObjectKey(heroKey),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(isDetail ? 0 : 12.0),
+              child: image,
+            ),
+          ),
+        if(heroKey == null)
           ClipRRect(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(isDetail ? 0 : 12.0),
             child: image,
           ),
         const SizedBox(height: 16.0),

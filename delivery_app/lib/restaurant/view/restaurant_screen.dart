@@ -81,7 +81,7 @@ class _RestaurantScreenState extends ConsumerState<RestaurantScreen> {
               onTap: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => RestaurantDetailSceen(
+                    builder: (_) => RestaurantDetailScreen(
                       id: pItem.id,
                     ),
                   ),

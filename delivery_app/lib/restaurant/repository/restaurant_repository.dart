@@ -1,6 +1,7 @@
 import 'package:delivery_app/common/dio/dio.dart';
 import 'package:delivery_app/common/model/cursor_pagination_model.dart';
 import 'package:delivery_app/common/model/pagination_params.dart';
+import 'package:delivery_app/common/repository/base_pagination_repository.dart';
 import 'package:delivery_app/restaurant/model/restaurant_detail_model.dart';
 import 'package:delivery_app/restaurant/model/restaurant_model.dart';
 import 'package:dio/dio.dart' hide Headers;
@@ -21,8 +22,8 @@ final restaurantRepositoryProvider = Provider<RestaurantRepository>(
   },
 );
 
-@RestApi()
-abstract class RestaurantRepository {
+@RestApi() //모든것을 제너릭으로 처리를 하면 편함. retaurantModel을 제너릭으로 받습니다. IBasePaginationRepository에서 정의함 ( paginate를 반환할 수 있음)
+abstract class RestaurantRepository implements IBasePaginationRepository<RestaurantModel>{
   factory RestaurantRepository(Dio dio, {String baseUrl}) =
       _RestaurantRepository;
 

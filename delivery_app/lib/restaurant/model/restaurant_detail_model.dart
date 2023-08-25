@@ -35,7 +35,7 @@ class RestaurantProductModel {
   final String id;
   final String name;
   @JsonKey(
-    fromJson: DataUtils.pahthUrl,
+    fromJson: DataUtils.pathToUrl,
   )
   final String imgUrl;
   final String detail;

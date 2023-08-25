@@ -13,7 +13,7 @@ class RestaurantModel {
   final String id;
   final String name;
   @JsonKey(
-    fromJson: DataUtils.pahthUrl,
+    fromJson: DataUtils.pathToUrl,
   )
   final String thumbUrl;
   final List<String> tags;
