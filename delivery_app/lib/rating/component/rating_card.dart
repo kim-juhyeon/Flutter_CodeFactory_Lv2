@@ -1,4 +1,5 @@
 import 'package:delivery_app/common/const/colors.dart';
+import 'package:delivery_app/rating/model/rating_model.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 
@@ -30,6 +31,20 @@ class RatingCard extends StatelessWidget {
       Key? key})
       : super(key: key);
 
+  factory RatingCard.fromModel({
+    required RatingModel model,
+  }) {
+    return RatingCard(
+      avatarImage: NetworkImage(
+        model.user.imageUrl,
+      ),
+      images: model.imgUrls.map((e) => Image.network(e)).toList(),
+      rating: model.rating,
+      email: model.user.username,
+      content: model.content,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -43,13 +58,13 @@ class RatingCard extends StatelessWidget {
         _body(
           content: content,
         ),
-        if(images.length > 0)
-        SizedBox(
-          height: 100,
-          child: _Images(
-            images: images,
+        if (images.length > 0)
+          SizedBox(
+            height: 100,
+            child: _Images(
+              images: images,
+            ),
           ),
-        ),
       ],
     );
   }
@@ -132,9 +147,12 @@ class _Images extends StatelessWidget {
     return ListView(
       scrollDirection: Axis.horizontal,
       children: images
-          .mapIndexed( //map을 진행할때 항상 elemet(e)값을 넣어야 하는데 collection.dart'; import를 해서 index값도 맵핑으로 padding값을 입력한다.
+          .mapIndexed(
+            //map을 진행할때 항상 elemet(e)값을 넣어야 하는데 collection.dart'; import를 해서 index값도 맵핑으로 padding값을 입력한다.
             (index, e) => Padding(
-              padding: EdgeInsets.only(right : index == images.length -1 ? 0 : 16.0), //images가 마지막 위치에 있는 이미지일경우에는 padding값을 0으로 한다.
+              padding:
+                  EdgeInsets.only(right: index == images.length - 1 ? 0 : 16.0),
+              //images가 마지막 위치에 있는 이미지일경우에는 padding값을 0으로 한다.
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
                 child: e,
