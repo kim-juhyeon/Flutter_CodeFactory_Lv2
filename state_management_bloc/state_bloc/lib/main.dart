@@ -32,7 +32,10 @@ class MyHomepage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<CounterCubit, CounterState>(
+      body: BlocConsumer<CounterCubit, CounterState>(
+        // BlocConsumer는 Listener와 build를 제공해줍니다.
+        //buildcallback을 이용할때 쓰면 좋음
+        // blocbuild을 이용하게 되면 동작이 여러가지일경우에는 오류가 발생합니다. 이유는 state를 계속 읽어들이고 있지 않기 때문입니다.
         listener: (context, state) {
           if (state.counter == 3) {
             showDialog(
@@ -51,24 +54,22 @@ class MyHomepage extends StatelessWidget {
             }
           }
         },
-        child: BlocBuilder<CounterCubit, CounterState>(
-          //제너릭에 부여할 함수 class를 기입합니다. 이후 state를 쉽게 접근이 가능함
-          builder: (context, state) {
-            return Center(
-              child: Text(
-                '${state.counter}',
-                style: TextStyle(fontSize: 51.0),
-              ),
-            );
-          },
-        ),
+        //제너릭에 부여할 함수 class를 기입합니다. 이후 state를 쉽게 접근이 가능함
+        builder: (context, state) {
+          return Center(
+            child: Text(
+              '${state.counter}',
+              style: TextStyle(fontSize: 51.0),
+            ),
+          );
+        },
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
             onPressed: () {
-              BlocProvider.of<CounterCubit>(context).increment();
+              context.read<CounterCubit>().increment();
             },
             child: Icon(Icons.add),
             heroTag: 'increment',
@@ -78,7 +79,7 @@ class MyHomepage extends StatelessWidget {
           ),
           FloatingActionButton(
             onPressed: () {
-              BlocProvider.of<CounterCubit>(context).decrement();
+              context.read<CounterCubit>().decrement();
             },
             child: Icon(Icons.remove),
             heroTag: 'derement',
